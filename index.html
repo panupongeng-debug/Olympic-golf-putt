@@ -28,18 +28,15 @@ button:hover { background-color:#00796b; opacity:0.9;}
 </head>
 <body>
 
+<!-- หน้า Setup -->
 <div class="container" id="setupScreen">
   <h1>Olympic Golf Putt Score App 🏌️‍♂️ by James</h1>
-  <div class="card">
-    <h2>กติกาอย่างง่าย</h2>
-    <ul>
-      <li>คะแนนสูงสุดชนะ</li>
-      <li>พัตใกล้หลุมที่สุด = 1, ต่อไป 2, 3,...</li>
-      <li>ยอดเงิน = ผู้เล่นแต่ละคนได้เงิน = คะแนนตัวเอง × ราคาต่อคะแนน × จำนวนผู้เล่นคนอื่น</li>
-      <li>ผู้เล่นคนอื่นเสียเงินเท่ากับ คะแนนของผู้เล่นที่ได้เงิน × ราคาต่อคะแนน</li>
-      <li>คะแนนเกิน Bokey ไม่นับ</li>
-    </ul>
+
+  <!-- ปุ่มดูกติกา -->
+  <div style="text-align:center; margin-bottom:15px;">
+    <button onclick="openRules()">📖 กติกา การแข่งขันพัตกอล์ฟรูปแบบโอลิมปิก</button>
   </div>
+
   <input type="number" id="numPlayers" placeholder="จำนวนผู้เล่น" min="2" max="10">
   <div id="playerNamesInputs"></div>
   <input type="number" id="pricePerPoint" placeholder="กรอกราคาต่อคะแนน">
@@ -47,6 +44,7 @@ button:hover { background-color:#00796b; opacity:0.9;}
   <button onclick="resetAll()">รีเซ็ตเกมทั้งหมด</button>
 </div>
 
+<!-- หน้า Game -->
 <div class="container" id="gameScreen" style="display:none;">
   <h2>หลุม <span id="currentHole">1</span>/18</h2>
   <div id="scoreInputs"></div>
@@ -58,6 +56,7 @@ button:hover { background-color:#00796b; opacity:0.9;}
   </div>
 </div>
 
+<!-- หน้า Summary -->
 <div class="container" id="summaryScreen" style="display:none;">
   <h2>สรุปผลคะแนน & เงิน</h2>
   <table class="score-table" id="summaryTable"></table>
@@ -69,20 +68,65 @@ button:hover { background-color:#00796b; opacity:0.9;}
   </div>
 </div>
 
+<!-- Modal กติกา -->
+<div class="modal" id="modalRules">
+  <div class="modal-content">
+    <h2>กติกา การแข่งขันพัตกอล์ฟรูปแบบโอลิมปิก (Olympic Putting Rules)</h2>
+    <ol>
+      <li>
+        <strong>เกณฑ์การให้คะแนน (Scoring System)</strong>
+        <p>คะแนนจะถูกมอบให้ตามลำดับความใกล้ของลูกที่ลงหลุมในแต่ละกรีน โดยพิจารณาจากตำแหน่งลูกก่อนการพัตครั้งแรก:</p>
+        <ul>
+          <li>อันดับที่ 1 (ใกล้หลุมที่สุด): ได้รับ 1 คะแนน</li>
+          <li>อันดับที่ 2: ได้รับ 2 คะแนน</li>
+          <li>อันดับที่ 3: ได้รับ 3 คะแนน</li>
+          <li>อันดับที่ 4: ได้รับ 4 คะแนน (กรณีมีผู้เล่น 4 ท่าน)</li>
+        </ul>
+        <p>ผู้ชนะรวม: ผู้ที่มีคะแนนสะสมรวมสูงสุดเป็นผู้ชนะ</p>
+      </li>
+      <li>
+        <strong>วิธีการคำนวณเงินรางวัล (Payout Calculation)</strong>
+        <ul>
+          <li>ผู้ที่ได้รับคะแนน: เงิน = คะแนนของตน × ราคาต่อคะแนน × จำนวนผู้เล่นคนอื่น</li>
+          <li>ผู้ที่ต้องจ่าย: เงิน = คะแนนของผู้ที่ได้แต้ม × ราคาต่อคะแนน</li>
+        </ul>
+      </li>
+      <li>
+        <strong>ข้อกำหนดพิเศษ (Special Rules)</strong>
+        <ul>
+          <li>Birdie Bonus: คูณ 2 ยอดเงิน/คะแนนในหลุมนั้น</li>
+          <li>Bokey Cap: Double Bogey ขึ้นไป = 0 คะแนน</li>
+          <li>Chip-in Bonus: ชิพลงจากนอกกรีน = คะแนนสูงสุดของหลุม</li>
+        </ul>
+      </li>
+      <li>
+        <strong>หมายเหตุเพิ่มเติม</strong>
+        <ul>
+          <li>การพัตนอกกรีน: ผู้เล่นตกลงร่วมกันว่าจะนับเป็นแต้มโอลิมปิกหรือไม่</li>
+          <li>ลำดับการเล่น: ลูกอยู่ไกลสุดพัตก่อน หากลงจะได้คะแนนสูงกว่าตามระยะ</li>
+        </ul>
+      </li>
+    </ol>
+    <button onclick="closeRules()">ปิด</button>
+  </div>
+</div>
+
+<!-- Modal สกอร์รายหลุม -->
+<div class="modal" id="modalHoleScores">
+  <div class="modal-content">
+    <h2>สกอร์รายหลุม</h2>
+    <table class="hole-table" id="holeScoreTable"></table>
+    <button onclick="closeHoleModal()" style="background:#26a69a;color:white;padding:10px 15px;border-radius:5px;margin-top:10px;">ปิด</button>
+  </div>
+</div>
+
+<!-- Modal รีเซ็ต -->
 <div class="modal" id="modalReset">
   <div class="modal-content">
     <h2>ยืนยันรีเซ็ตเกมทั้งหมด</h2>
     <p>ข้อมูลทั้งหมดจะถูก Reset</p>
     <button onclick="confirmReset()">ยืนยัน</button>
     <button onclick="closeModal()">ยกเลิก</button>
-  </div>
-</div>
-
-<div class="modal" id="modalHoleScores">
-  <div class="modal-content">
-    <h2>สกอร์รายหลุม</h2>
-    <table class="hole-table" id="holeScoreTable"></table>
-    <button onclick="closeHoleModal()" style="background:#26a69a;color:white;padding:10px 15px;border-radius:5px;margin-top:10px;">ปิด</button>
   </div>
 </div>
 
@@ -222,44 +266,41 @@ function showHoleScores(){
 function closeHoleModal(){document.getElementById('modalHoleScores').style.display='none';}
 document.getElementById('modalHoleScores').addEventListener('click', function(e){if(e.target===this){this.style.display='none';}});
 
+// rules modal
+function openRules() { document.getElementById('modalRules').style.display = 'flex'; }
+function closeRules() { document.getElementById('modalRules').style.display = 'none'; }
+document.getElementById('modalRules').addEventListener('click', function(e){ if(e.target===this) { this.style.display='none'; }});
+
 // reset
 function resetAll(){document.getElementById('modalReset').style.display='flex'; document.getElementById('modalReset').querySelector('p').textContent="ข้อมูลทั้งหมดจะถูก Reset";}
 function confirmReset(){localStorage.removeItem('players'); localStorage.removeItem('scores'); location.reload();}
 function closeModal(){document.getElementById('modalReset').style.display='none';}
 function goToSetup(){resetAll();}
 function goToHole(h){currentHole=h; showGameScreen();}
-  
+
 // player input generate
 document.getElementById('numPlayers').addEventListener('input', function(){
-  let n=parseInt(this.value); let html='';
+  let n=parseInt(this.value); 
+  let html='';
   for(let i=0;i<n;i++){
-    let saved=JSON.parse(localStorage.getItem('players')||'[]');
-    html+=`<input type="text" id="playerName${i}" placeholder="ชื่อผู้เล่น ${i+1}" value="${saved[i]||''}">`;
-  }
+    let saved=JSON.parse(localStorage.getItem('players')||'[]'); 
+    html+=`<input type="text" id="playerName${i}" placeholder="ชื่อผู้เล่น ${i+1}" value="${saved[i]||''}">`; 
+  } 
   document.getElementById('playerNamesInputs').innerHTML=html;
 });
 
-// โหลดจาก storage
-window.onload = function(){
-  let savedPlayers = JSON.parse(localStorage.getItem('players') || '[]');
-  let savedScores = JSON.parse(localStorage.getItem('scores') || '[]');
-
-  if(savedPlayers.length > 0){
-    players = savedPlayers;
-    scores = savedScores.length ? savedScores : Array(players.length).fill(0).map(()=>Array(numHoles).fill(0));
-    currentHole = 0; // สามารถปรับให้โหลดหลุมล่าสุด
-    showGameScreen(true); // true = โหลดจาก storage ไม่สร้าง input ซ้ำ
+// load from localStorage
+window.onload=function(){
+  let savedPlayers=JSON.parse(localStorage.getItem('players')||'[]');
+  let savedScores=JSON.parse(localStorage.getItem('scores')||'[]');
+  if(savedPlayers.length>0){
+    players=savedPlayers;
+    scores=savedScores;
+    document.getElementById('numPlayers').value=savedPlayers.length;
+    document.getElementById('numPlayers').dispatchEvent(new Event('input'));
   }
-};
-
-// service worker
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", function() {
-    navigator.serviceWorker.register("service-worker.js")
-    .then(function(registration) {console.log("Service Worker registered:", registration.scope);}, 
-          function(err){console.log("Service Worker registration failed:", err);});
-  });
 }
 </script>
+
 </body>
 </html>
