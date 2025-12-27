@@ -3,67 +3,64 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Olympic Golf Putt Score App 🏌️‍♂️ by James</title>
+<title>Olympic Golf Putt Score App 🏌️‍♂️by James</title>
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#26a69a">
 <style>
-body { font-family: Arial, sans-serif; margin:0; padding:0; background:#e0f2f1; color:#004d40;}
-.container { max-width:600px; margin:20px auto; background:#fff; padding:20px; border-radius:10px; box-shadow:0 3px 10px rgba(0,0,0,0.2);}
-h1,h2 { text-align:center; color:#00695c;}
-input[type="text"], input[type="number"] { width:100%; padding:8px; margin:5px 0 15px; box-sizing:border-box; border:1px solid #26a69a; border-radius:5px;}
-button { padding:10px 15px; margin:5px; border:none; border-radius:5px; cursor:pointer; background-color:#26a69a; color:white; font-weight:bold; transition:0.2s;}
-button:hover { background-color:#00796b; opacity:0.9;}
-.card { background:#b2dfdb; padding:12px; border-radius:8px; margin-bottom:15px;}
-.score-table,.hole-table { width:100%; border-collapse: collapse; margin-top:10px; }
-.score-table th,.score-table td,.hole-table th,.hole-table td { border:1px solid #004d40; padding:5px; text-align:center; }
-.winner { background:#80cbc4; font-weight:bold; }
+body { font-family: Arial, sans-serif; margin:0; padding:0; background:#e0f7fa; }
+.container { max-width:600px; margin:20px auto; background:#d0f0e0; padding:20px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.2); }
+h1, h2 { text-align:center; color:#00695c; }
+input[type="text"], input[type="number"] { width:100%; padding:8px; margin:5px 0 15px; box-sizing:border-box; border-radius:5px; border:1px solid #00796b; }
+button { padding:10px 15px; margin:3px; border:none; border-radius:5px; cursor:pointer; background:#00796b; color:#fff; }
+button:hover { opacity:0.9; }
+.card { background:#b2dfdb; padding:10px; border-radius:5px; margin-bottom:15px; }
+.score-table, .hole-table { width:100%; border-collapse: collapse; margin-top:10px; }
+.score-table th, .score-table td, .hole-table th, .hole-table td { border:1px solid #004d40; padding:5px; text-align:center; }
+.winner { background:gold; font-weight:bold; }
 .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; }
-.modal-content { background:#fff; padding:20px; border-radius:10px; max-width:400px; width:90%; max-height:80vh; overflow-y:auto;}
-.label-player { font-weight:bold; color:#004d40; }
-.summary-buttons { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin-top:10px; }
-.summary-buttons button { flex:1 1 120px; padding:10px; border-radius:5px; border:none; cursor:pointer; background-color:#26a69a; color:white; font-weight:bold; }
-.summary-buttons button:hover { background-color:#00796b; opacity:0.9; }
-.hole-table { display:block; overflow-x:auto; white-space:nowrap; }
+.modal-content { background:#fff; padding:20px; border-radius:8px; max-width:400px; width:90%; overflow-y:auto; max-height:90%; }
+.modal-content h2 { margin-top:0; color:#00695c; }
+.modal button { margin-top:10px; background:#00796b; }
+.label-player { font-weight:bold; }
+.flex-btn { display:flex; flex-wrap:wrap; justify-content:center; }
+.flex-btn button { flex:1 1 auto; margin:3px; min-width:80px; }
 </style>
 </head>
 <body>
 
-<!-- หน้า Setup -->
 <div class="container" id="setupScreen">
-  <h1>Olympic Golf Putt Score App 🏌️‍♂️ by James</h1>
-
-  <!-- ปุ่มดูกติกา -->
-  <div style="text-align:center; margin-bottom:15px;">
-    <button onclick="openRules()">📖 กติกา การแข่งขันพัตกอล์ฟรูปแบบโอลิมปิก</button>
+  <h1>Olympic Golf Putt Score App 🏌️‍♂️by James</h1>
+  <div class="card">
+    <button onclick="openRules()">📖 กติกา</button>
   </div>
-
   <input type="number" id="numPlayers" placeholder="จำนวนผู้เล่น" min="2" max="10">
   <div id="playerNamesInputs"></div>
   <input type="number" id="pricePerPoint" placeholder="กรอกราคาต่อคะแนน">
-  <button onclick="startGame()">เริ่มเกม</button>
-  <button onclick="resetAll()">รีเซ็ตเกมทั้งหมด</button>
-</div>
-
-<!-- หน้า Game -->
-<div class="container" id="gameScreen" style="display:none;">
-  <h2>หลุม <span id="currentHole">1</span>/18</h2>
-  <div id="scoreInputs"></div>
-  <div class="summary-buttons">
-    <button onclick="prevHole()">⬅ กลับ</button>
-    <button onclick="nextHole()">ถัดไป(ว่าง=0)</button>
-    <button onclick="showHoleScores()">📊 ดูสกอร์รายหลุม</button>
+  <div class="flex-btn">
+    <button onclick="startGame()">เริ่มเกม</button>
     <button onclick="resetAll()">รีเซ็ตเกมทั้งหมด</button>
   </div>
 </div>
 
-<!-- หน้า Summary -->
+<div class="container" id="gameScreen" style="display:none;">
+  <h2>หลุม <span id="currentHole">1</span>/18</h2>
+  <div id="scoreInputs"></div>
+  <div class="flex-btn">
+    <button onclick="prevHole()">⬅ กลับ</button>
+    <button onclick="nextHole()">ถัดไป(ว่าง=0)</button>
+    <button onclick="showHoleScores()">📊 ดูสกอร์รายหลุม</button>
+    <button onclick="goToHole(8)">↩ หลุม 9</button>
+    <button onclick="goToHole(17)">↩ หลุม 18</button>
+    <button onclick="resetAll()">รีเซ็ตเกมทั้งหมด</button>
+  </div>
+</div>
+
 <div class="container" id="summaryScreen" style="display:none;">
   <h2>สรุปผลคะแนน & เงิน</h2>
   <table class="score-table" id="summaryTable"></table>
-  <div class="summary-buttons">
-    <button onclick="goToHole(8)">✏️ แก้ไขหลุม 9</button>
-    <button onclick="goToHole(17)">✏️ แก้ไขหลุม 18</button>
+  <div class="flex-btn">
     <button onclick="shareResults()">📤 แชร์ผลลัพธ์</button>
+    <button onclick="goToHole(8)">↩ หลุม 9</button>
+    <button onclick="goToHole(17)">↩ หลุม 18</button>
     <button onclick="goToSetup()">🏠 หน้าแรก</button>
   </div>
 </div>
@@ -75,35 +72,41 @@ button:hover { background-color:#00796b; opacity:0.9;}
     <ol>
       <li>
         <strong>เกณฑ์การให้คะแนน (Scoring System)</strong>
-        <p>คะแนนจะถูกมอบให้ตามลำดับความใกล้ของลูกที่ลงหลุมในแต่ละกรีน โดยพิจารณาจากตำแหน่งลูกก่อนการพัตครั้งแรก:</p>
+        <p>คะแนนจะถูกมอบให้ตามลำดับความใกล้ของลูกที่ลงหลุม:</p>
         <ul>
-          <li>อันดับที่ 1 (ใกล้หลุมที่สุด): ได้รับ 1 คะแนน</li>
-          <li>อันดับที่ 2: ได้รับ 2 คะแนน</li>
-          <li>อันดับที่ 3: ได้รับ 3 คะแนน</li>
-          <li>อันดับที่ 4: ได้รับ 4 คะแนน (กรณีมีผู้เล่น 4 ท่าน)</li>
+          <li>อันดับ 1: 1 คะแนน</li>
+          <li>อันดับ 2: 2 คะแนน</li>
+          <li>อันดับ 3: 3 คะแนน</li>
+          <li>อันดับ 4: 4 คะแนน (กรณีมีผู้เล่น 4 คน)</li>
         </ul>
-        <p>ผู้ชนะรวม: ผู้ที่มีคะแนนสะสมรวมสูงสุดเป็นผู้ชนะ</p>
+        <p>ผู้ชนะรวม: คะแนนรวมสูงสุด</p>
       </li>
       <li>
         <strong>วิธีการคำนวณเงินรางวัล (Payout Calculation)</strong>
         <ul>
-          <li>ผู้ที่ได้รับคะแนน: เงิน = คะแนนของตน × ราคาต่อคะแนน × จำนวนผู้เล่นคนอื่น</li>
-          <li>ผู้ที่ต้องจ่าย: เงิน = คะแนนของผู้ที่ได้แต้ม × ราคาต่อคะแนน</li>
+          <li>ผู้ได้คะแนน: คะแนน × ราคาต่อคะแนน × จำนวนผู้เล่นคนอื่น</li>
+          <li>ผู้จ่าย: คะแนนของผู้ได้แต้ม × ราคาต่อคะแนน</li>
+        </ul>
+        <p><strong>ตัวอย่างการคำนวณ:</strong></p>
+        <p>ผู้เล่น 4 คน (A,B,C,D), ราคา 100/คะแนน, นาย A พัตลงจากระยะไกลที่สุด (4 คะแนน):</p>
+        <ul>
+          <li>นาย A: ได้รับเงินจาก B,C,D คนละ 400 บาท (รวม 1,200 บาท)</li>
+          <li>นาย B,C,D: ต้องจ่ายให้นาย A คนละ 400 บาท</li>
         </ul>
       </li>
       <li>
         <strong>ข้อกำหนดพิเศษ (Special Rules)</strong>
         <ul>
-          <li>Birdie Bonus: คูณ 2 ยอดเงิน/คะแนนในหลุมนั้น</li>
+          <li>Birdie Bonus: คูณ 2 คะแนน/เงิน</li>
           <li>Bokey Cap: Double Bogey ขึ้นไป = 0 คะแนน</li>
-          <li>Chip-in Bonus: ชิพลงจากนอกกรีน = คะแนนสูงสุดของหลุม</li>
+          <li>Chip-in Bonus: ชิพลงจากนอกกรีน = คะแนนสูงสุดของหลุม + โบนัส</li>
         </ul>
       </li>
       <li>
         <strong>หมายเหตุเพิ่มเติม</strong>
         <ul>
-          <li>การพัตนอกกรีน: ผู้เล่นตกลงร่วมกันว่าจะนับเป็นแต้มโอลิมปิกหรือไม่</li>
-          <li>ลำดับการเล่น: ลูกอยู่ไกลสุดพัตก่อน หากลงจะได้คะแนนสูงกว่าตามระยะ</li>
+          <li>พัตนอกกรีน: ผู้เล่นตกลงก่อนเริ่ม</li>
+          <li>ลำดับการเล่น: ลูกไกลสุดพัตก่อน</li>
         </ul>
       </li>
     </ol>
@@ -111,16 +114,16 @@ button:hover { background-color:#00796b; opacity:0.9;}
   </div>
 </div>
 
-<!-- Modal สกอร์รายหลุม -->
+<!-- Modal สกอร์หลุม -->
 <div class="modal" id="modalHoleScores">
   <div class="modal-content">
     <h2>สกอร์รายหลุม</h2>
     <table class="hole-table" id="holeScoreTable"></table>
-    <button onclick="closeHoleModal()" style="background:#26a69a;color:white;padding:10px 15px;border-radius:5px;margin-top:10px;">ปิด</button>
+    <button onclick="closeHoleModal()">ปิด</button>
   </div>
 </div>
 
-<!-- Modal รีเซ็ต -->
+<!-- Modal Reset -->
 <div class="modal" id="modalReset">
   <div class="modal-content">
     <h2>ยืนยันรีเซ็ตเกมทั้งหมด</h2>
@@ -133,62 +136,27 @@ button:hover { background-color:#00796b; opacity:0.9;}
 <script>
 let players=[], scores=[], currentHole=0, numHoles=18, pricePerPoint=10;
 
-// เริ่มเกม
 function startGame(){
   let num = parseInt(document.getElementById('numPlayers').value);
   if(isNaN(num)||num<2){alert("กรุณากรอกจำนวนผู้เล่นอย่างน้อย 2 คน"); return;}
   let priceInput = parseFloat(document.getElementById('pricePerPoint').value);
-  if(isNaN(priceInput)||priceInput<=0){alert("กรุณากรอกราคาต่อคะแนนก่อนเริ่มเกม"); return;}
-  pricePerPoint = priceInput;
-
-  players=[]; 
-  for(let i=0;i<num;i++){
-    let name = document.getElementById('playerName'+i).value.trim()||'ผู้เล่น'+(i+1);
-    players.push(name);
-  }
-  localStorage.setItem('players', JSON.stringify(players));
-
-  if(!scores.length || scores.length !== num) {
-    scores=Array(num).fill(0).map(()=>Array(numHoles).fill(0));
-  }
-  localStorage.setItem('scores', JSON.stringify(scores));
-
+  if(isNaN(priceInput)||priceInput<=0){alert("กรุณากรอกราคาต่อคะแนน"); return;}
+  pricePerPoint=priceInput;
+  players=[]; for(let i=0;i<num;i++){players.push(document.getElementById('playerName'+i).value.trim()||'ผู้เล่น'+(i+1));}
+  scores=Array(num).fill(0).map(()=>Array(numHoles).fill(0));
   currentHole=0;
+  saveData();
   showGameScreen();
 }
 
-// แสดงหน้าเกม
-function showGameScreen(fromStorage=false){
+function showGameScreen(){
   document.getElementById('setupScreen').style.display='none';
   document.getElementById('summaryScreen').style.display='none';
   document.getElementById('gameScreen').style.display='block';
-  document.getElementById('currentHole').textContent = currentHole+1;
-
-  if(!fromStorage){
-    renderScoreInputs();
-  } else {
-    let html = '';
-    players.forEach((p,i)=>{
-      let runningTotal = scores[i].slice(0,currentHole).reduce((a,b)=>a+b,0);
-      let currentScore = scores[i][currentHole]||0;
-      let totalWithCurrent = runningTotal + currentScore;
-      html+=`<div><label id="label${i}" class="label-player">${p} (รวม: ${totalWithCurrent})</label><input type="number" id="score${i}" value="${scores[i][currentHole]||''}"></div>`;
-    });
-    document.getElementById('scoreInputs').innerHTML = html;
-
-    players.forEach((p,i)=>{
-      document.getElementById('score'+i).addEventListener('input', ()=>{
-        let val = parseFloat(document.getElementById('score'+i).value);
-        scores[i][currentHole]=isNaN(val)?0:val;
-        localStorage.setItem('scores', JSON.stringify(scores));
-        updateRankHighlight();
-      });
-    });
-    updateRankHighlight();
-  }
+  document.getElementById('currentHole').textContent=currentHole+1;
+  renderScoreInputs();
 }
 
-// render score input
 function renderScoreInputs(){
   let html='';
   let totals = players.map((p,i)=>scores[i].reduce((a,b)=>a+b,0));
@@ -196,100 +164,121 @@ function renderScoreInputs(){
     let runningTotal = scores[i].slice(0,currentHole).reduce((a,b)=>a+b,0);
     let currentScore = scores[i][currentHole]||0;
     let totalWithCurrent = runningTotal+currentScore;
-    totals[i] = totalWithCurrent;
+    totals[i]=totalWithCurrent;
     html+=`<div><label id="label${i}" class="label-player">${p} (รวม: ${totalWithCurrent})</label><input type="number" id="score${i}" value="${scores[i][currentHole]||''}"></div>`;
   });
   document.getElementById('scoreInputs').innerHTML=html;
-
   players.forEach((p,i)=>{
     document.getElementById('score'+i).addEventListener('input', ()=>{
       let val = parseFloat(document.getElementById('score'+i).value);
       scores[i][currentHole]=isNaN(val)?0:val;
-      localStorage.setItem('scores', JSON.stringify(scores));
+      saveData();
       updateRankHighlight();
     });
   });
   updateRankHighlight();
 }
 
-// update rank highlight
 function updateRankHighlight(){
   let totals = players.map((p,i)=>scores[i].slice(0,currentHole+1).reduce((a,b)=>a+b,0));
   let sorted = [...totals].map((v,i)=>({i,v})).sort((a,b)=>b.v-a.v);
   players.forEach((p,i)=>{
     document.getElementById('label'+i).textContent = `${p} (รวม: ${totals[i]})`;
-    document.getElementById('label'+i).style.color = '#004d40';
+    document.getElementById('label'+i).style.color='black';
   });
   if(sorted[0]) document.getElementById('label'+sorted[0].i).style.color='gold';
   if(sorted[1]) document.getElementById('label'+sorted[1].i).style.color='silver';
   if(sorted[2]) document.getElementById('label'+sorted[2].i).style.color='#cd7f32';
 }
 
-// next/prev hole
-function nextHole(){players.forEach((p,i)=>{scores[i][currentHole]=parseFloat(document.getElementById('score'+i).value)||0; localStorage.setItem('scores', JSON.stringify(scores));}); currentHole++; if(currentHole>=numHoles) showSummary(); else showGameScreen();}
-function prevHole(){players.forEach((p,i)=>{scores[i][currentHole]=parseFloat(document.getElementById('score'+i).value)||0; localStorage.setItem('scores', JSON.stringify(scores));}); if(currentHole>0){currentHole--; showGameScreen();}}
+function nextHole(){ saveCurrentScores(); currentHole++; if(currentHole>=numHoles) showSummary(); else showGameScreen();}
+function prevHole(){ saveCurrentScores(); if(currentHole>0){currentHole--; showGameScreen();} }
+function goToHole(hole){ saveCurrentScores(); currentHole=hole; showGameScreen(); }
+function saveCurrentScores(){ players.forEach((p,i)=>{scores[i][currentHole]=parseFloat(document.getElementById('score'+i).value)||0;}); saveData(); }
 
-// summary
 function showSummary(){
   document.getElementById('gameScreen').style.display='none';
   document.getElementById('summaryScreen').style.display='block';
   let html='<tr><th>ผู้เล่น</th><th>คะแนนรวม</th><th>เงิน</th></tr>';
-  let totals = players.map((p,i)=>scores[i].reduce((a,b)=>a+b,0));
-  let money = Array(players.length).fill(0);
-  players.forEach((p,i)=>{let gain=totals[i]*pricePerPoint*(players.length-1); money[i]+=gain; players.forEach((other,j)=>{if(i!=j) money[j]-=totals[i]*pricePerPoint;});});
+  let totals=players.map((p,i)=>scores[i].reduce((a,b)=>a+b,0));
+  let money=Array(players.length).fill(0);
+  players.forEach((p,i)=>{
+    let gain=totals[i]*pricePerPoint*(players.length-1);
+    money[i]+=gain;
+    players.forEach((other,j)=>{if(i!=j) money[j]-=totals[i]*pricePerPoint;});
+  });
   let maxScore=Math.max(...totals);
-  players.forEach((p,i)=>{let cls=(totals[i]==maxScore)?'winner':''; html+=`<tr class="${cls}"><td>${p}</td><td>${totals[i]}</td><td>${money[i]}</td></tr>`;});
+  players.forEach((p,i)=>{
+    let cls=(totals[i]==maxScore)?'winner':'';
+    html+=`<tr class="${cls}"><td>${p}</td><td>${totals[i]}</td><td>${money[i]}</td></tr>`;
+  });
   document.getElementById('summaryTable').innerHTML=html;
 }
 
-// share
 function shareResults(){
-  let totals = players.map((p,i)=>scores[i].reduce((a,b)=>a+b,0));
-  let money = Array(players.length).fill(0);
-  players.forEach((p,i)=>{let gain=totals[i]*pricePerPoint*(players.length-1); money[i]+=gain; players.forEach((other,j)=>{if(i!=j) money[j]-=totals[i]*pricePerPoint;});});
-  let resultText='สรุปผล Golf Putt:\n'; players.forEach((p,i)=>{resultText+=`${p}: คะแนนรวม ${totals[i]}, เงิน ${money[i]}\n`;});
-  let textarea=document.createElement('textarea'); textarea.value=resultText; document.body.appendChild(textarea); textarea.select();
-  try{document.execCommand('copy'); alert('ผลลัพธ์ถูกคัดลอกไป clipboard แล้ว!');} catch(e){alert('ไม่สามารถคัดลอกไป clipboard ได้, กรุณาคัดลอกด้วยมือ:\n'+resultText);}
+  let totals=players.map((p,i)=>scores[i].reduce((a,b)=>a+b,0));
+  let money=Array(players.length).fill(0);
+  players.forEach((p,i)=>{
+    let gain=totals[i]*pricePerPoint*(players.length-1);
+    money[i]+=gain;
+    players.forEach((other,j)=>{if(i!=j) money[j]-=totals[i]*pricePerPoint;});
+  });
+  let resultText='สรุปผล Golf Putt:\n';
+  players.forEach((p,i)=>{resultText+=`${p}: คะแนนรวม ${totals[i]}, เงิน ${money[i]}\n`;});
+  let textarea=document.createElement('textarea'); textarea.value=resultText;
+  document.body.appendChild(textarea); textarea.select();
+  try{document.execCommand('copy'); alert('ผลลัพธ์คัดลอกไป clipboard แล้ว!'); } 
+  catch(e){alert('ไม่สามารถคัดลอกไป clipboard ได้:\n'+resultText);}
   document.body.removeChild(textarea);
 }
 
-// hole scores
 function showHoleScores(){
-  let html='<tr><th>หลุม</th>'; players.forEach(p=>html+=`<th>${p}</th>`); html+='<th>คะแนนรวมสะสม</th></tr>';
+  let html='<tr><th>หลุม</th>';
+  players.forEach(p=>html+=`<th>${p}</th>`);
+  html+='<th>คะแนนรวมสะสม</th></tr>';
   let runningTotals=Array(players.length).fill(0);
-  for(let h=0;h<numHoles;h++){html+='<tr><td>'+(h+1)+'</td>'; players.forEach((p,i)=>{runningTotals[i]+=scores[i][h]; html+='<td>'+scores[i][h]+'</td>';}); html+='<td>'+runningTotals.join(' | ')+'</td>'; html+='</tr>';}
+  for(let h=0;h<numHoles;h++){
+    html+='<tr><td>'+(h+1)+'</td>';
+    players.forEach((p,i)=>{runningTotals[i]+=scores[i][h]; html+='<td>'+scores[i][h]+'</td>';});
+    html+='<td>'+runningTotals.join(' | ')+'</td>';
+    html+='</tr>';
+  }
   document.getElementById('holeScoreTable').innerHTML=html;
   document.getElementById('modalHoleScores').style.display='flex';
 }
-
-// modal
 function closeHoleModal(){document.getElementById('modalHoleScores').style.display='none';}
-document.getElementById('modalHoleScores').addEventListener('click', function(e){if(e.target===this){this.style.display='none';}});
 
-// rules modal
-function openRules() { document.getElementById('modalRules').style.display = 'flex'; }
-function closeRules() { document.getElementById('modalRules').style.display = 'none'; }
-document.getElementById('modalRules').addEventListener('click', function(e){ if(e.target===this) { this.style.display='none'; }});
+function openRules(){document.getElementById('modalRules').style.display='flex';}
+function closeRules(){document.getElementById('modalRules').style.display='none';}
 
-// reset
-function resetAll(){document.getElementById('modalReset').style.display='flex'; document.getElementById('modalReset').querySelector('p').textContent="ข้อมูลทั้งหมดจะถูก Reset";}
+function resetAll(){document.getElementById('modalReset').style.display='flex';}
 function confirmReset(){localStorage.removeItem('players'); localStorage.removeItem('scores'); location.reload();}
 function closeModal(){document.getElementById('modalReset').style.display='none';}
-function goToSetup(){resetAll();}
-function goToHole(h){currentHole=h; showGameScreen();}
+function goToSetup(){showScreen('setupScreen');}
 
-// player input generate
+function showScreen(id){
+  document.getElementById('setupScreen').style.display='none';
+  document.getElementById('gameScreen').style.display='none';
+  document.getElementById('summaryScreen').style.display='none';
+  document.getElementById(id).style.display='block';
+}
+
+function saveData(){
+  localStorage.setItem('players', JSON.stringify(players));
+  localStorage.setItem('scores', JSON.stringify(scores));
+}
+
+// Dynamic player inputs
 document.getElementById('numPlayers').addEventListener('input', function(){
-  let n=parseInt(this.value); 
-  let html='';
+  let n=parseInt(this.value); let html='';
   for(let i=0;i<n;i++){
     let saved=JSON.parse(localStorage.getItem('players')||'[]'); 
-    html+=`<input type="text" id="playerName${i}" placeholder="ชื่อผู้เล่น ${i+1}" value="${saved[i]||''}">`; 
-  } 
+    html+=`<input type="text" id="playerName${i}" placeholder="ชื่อผู้เล่น ${i+1}" value="${saved[i]||''}">`;
+  }
   document.getElementById('playerNamesInputs').innerHTML=html;
 });
 
-// load from localStorage
+// Load saved data
 window.onload=function(){
   let savedPlayers=JSON.parse(localStorage.getItem('players')||'[]');
   let savedScores=JSON.parse(localStorage.getItem('scores')||'[]');
