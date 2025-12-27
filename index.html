@@ -50,7 +50,7 @@ button:hover { opacity:0.9; }
     <button onclick="showHoleScores()">📊 ดูสกอร์รายหลุม</button>
     <button onclick="goToHole(8)">↩ หลุม 9</button>
     <button onclick="goToHole(17)">↩ หลุม 18</button>
-    <button onclick="resetAll()">รีเซ็ตเกมทั้งหมด</button>
+    <button onclick="resetAll()">♻️ รีเซ็ตเกมทั้งหมด</button>
   </div>
 </div>
 
@@ -61,7 +61,7 @@ button:hover { opacity:0.9; }
     <button onclick="shareResults()">📤 แชร์ผลลัพธ์</button>
     <button onclick="goToHole(8)">↩ หลุม 9</button>
     <button onclick="goToHole(17)">↩ หลุม 18</button>
-    <button onclick="goToSetup()">🏠 หน้าแรก</button>
+    <button onclick="resetAll()">♻️ รีเซ็ตเกมทั้งหมด</button>
   </div>
 </div>
 
@@ -136,19 +136,10 @@ button:hover { opacity:0.9; }
 <script>
 let players=[], scores=[], currentHole=0, numHoles=18, pricePerPoint=10;
 
-// โหลดข้อมูลจาก localStorage
-function loadData(){
-  players = JSON.parse(localStorage.getItem('players')||'[]');
-  scores = JSON.parse(localStorage.getItem('scores')||'[]');
-}
+// โหลด/บันทึก
+function loadData(){ players=JSON.parse(localStorage.getItem('players')||'[]'); scores=JSON.parse(localStorage.getItem('scores')||'[]'); }
+function saveData(){ localStorage.setItem('players',JSON.stringify(players)); localStorage.setItem('scores',JSON.stringify(scores)); }
 
-// บันทึกข้อมูลลง localStorage
-function saveData(){
-  localStorage.setItem('players', JSON.stringify(players));
-  localStorage.setItem('scores', JSON.stringify(scores));
-}
-
-// เริ่มเกม
 function startGame(){
   let num=parseInt(document.getElementById('numPlayers').value);
   if(isNaN(num)||num<2){alert("กรุณากรอกจำนวนผู้เล่นอย่างน้อย 2 คน"); return;}
@@ -156,7 +147,6 @@ function startGame(){
   if(isNaN(priceInput)||priceInput<=0){alert("กรุณากรอกราคาต่อคะแนน"); return;}
   pricePerPoint=priceInput;
 
-  let savedPlayers=JSON.parse(localStorage.getItem('players')||'[]');
   let savedScores=JSON.parse(localStorage.getItem('scores')||'[]');
 
   players=[]; scores=[];
@@ -164,9 +154,7 @@ function startGame(){
     players.push(document.getElementById('playerName'+i).value.trim()||'ผู้เล่น'+(i+1));
     scores.push(savedScores[i]||Array(numHoles).fill(0));
   }
-  currentHole=0;
-  saveData();
-  showGameScreen();
+  currentHole=0; saveData(); showGameScreen();
 }
 
 function showGameScreen(){
@@ -190,10 +178,8 @@ function renderScoreInputs(){
   document.getElementById('scoreInputs').innerHTML=html;
   players.forEach((p,i)=>{
     document.getElementById('score'+i).addEventListener('input',()=>{
-      let val=parseFloat(document.getElementById('score'+i).value);
-      scores[i][currentHole]=isNaN(val)?0:val;
-      saveData();
-      updateRankHighlight();
+      scores[i][currentHole]=parseFloat(document.getElementById('score'+i).value)||0;
+      saveData(); updateRankHighlight();
     });
   });
   updateRankHighlight();
@@ -211,14 +197,9 @@ function updateRankHighlight(){
   if(sorted[2]) document.getElementById('label'+sorted[2].i).style.color='#cd7f32';
 }
 
-function saveCurrentScores(){
-  players.forEach((p,i)=>{
-    scores[i][currentHole]=parseFloat(document.getElementById('score'+i).value)||0;
-  });
-  saveData();
-}
+function saveCurrentScores(){ players.forEach((p,i)=>scores[i][currentHole]=parseFloat(document.getElementById('score'+i).value)||0); saveData(); }
 
-function nextHole(){ saveCurrentScores(); currentHole++; if(currentHole>=numHoles) showSummary(); else showGameScreen();}
+function nextHole(){ saveCurrentScores(); currentHole++; if(currentHole>=numHoles) showSummary(); else showGameScreen(); }
 function prevHole(){ saveCurrentScores(); if(currentHole>0){currentHole--; showGameScreen();} }
 function goToHole(hole){ saveCurrentScores(); currentHole=hole; showGameScreen(); }
 
@@ -234,10 +215,7 @@ function showSummary(){
     players.forEach((other,j)=>{if(i!=j) money[j]-=totals[i]*pricePerPoint;});
   });
   let maxScore=Math.max(...totals);
-  players.forEach((p,i)=>{
-    let cls=(totals[i]==maxScore)?'winner':'';
-    html+=`<tr class="${cls}"><td>${p}</td><td>${totals[i]}</td><td>${money[i]}</td></tr>`;
-  });
+  players.forEach((p,i)=>{ let cls=(totals[i]==maxScore)?'winner':''; html+=`<tr class="${cls}"><td>${p}</td><td>${totals[i]}</td><td>${money[i]}</td></tr>`; });
   document.getElementById('summaryTable').innerHTML=html;
 }
 
@@ -259,18 +237,10 @@ function shareResults(){
 }
 
 function showHoleScores(){
-  let html='<tr><th>หลุม</th>';
-  players.forEach(p=>html+=`<th>${p}</th>`);
-  html+='<th>คะแนนรวมสะสม</th></tr>';
+  let html='<tr><th>หลุม</th>'; players.forEach(p=>html+=`<th>${p}</th>`); html+='<th>คะแนนรวมสะสม</th></tr>';
   let runningTotals=Array(players.length).fill(0);
-  for(let h=0;h<numHoles;h++){
-    html+='<tr><td>'+(h+1)+'</td>';
-    players.forEach((p,i)=>{runningTotals[i]+=scores[i][h]; html+='<td>'+scores[i][h]+'</td>';});
-    html+='<td>'+runningTotals.join(' | ')+'</td>';
-    html+='</tr>';
-  }
-  document.getElementById('holeScoreTable').innerHTML=html;
-  document.getElementById('modalHoleScores').style.display='flex';
+  for(let h=0;h<numHoles;h++){ html+='<tr><td>'+(h+1)+'</td>'; players.forEach((p,i)=>{runningTotals[i]+=scores[i][h]; html+='<td>'+scores[i][h]+'</td>';}); html+='<td>'+runningTotals.join(' | ')+'</td>'; html+='</tr>'; }
+  document.getElementById('holeScoreTable').innerHTML=html; document.getElementById('modalHoleScores').style.display='flex';
 }
 function closeHoleModal(){document.getElementById('modalHoleScores').style.display='none';}
 
@@ -300,13 +270,7 @@ document.getElementById('numPlayers').addEventListener('input', function(){
 });
 
 // โหลดข้อมูลเมื่อเปิดหน้า
-window.onload=function(){
-  loadData();
-  if(players.length>0){
-    document.getElementById('numPlayers').value=players.length;
-    document.getElementById('numPlayers').dispatchEvent(new Event('input'));
-  }
-}
+window.onload=function(){ loadData(); if(players.length>0){document.getElementById('numPlayers').value=players.length; document.getElementById('numPlayers').dispatchEvent(new Event('input')); } }
 </script>
 
 </body>
