@@ -89,6 +89,7 @@ button:hover { background-color:#00796b; opacity:0.9;}
 <script>
 let players=[], scores=[], currentHole=0, numHoles=18, pricePerPoint=10;
 
+// เริ่มเกม
 function startGame(){
   let num = parseInt(document.getElementById('numPlayers').value);
   if(isNaN(num)||num<2){alert("กรุณากรอกจำนวนผู้เล่นอย่างน้อย 2 คน"); return;}
@@ -112,14 +113,38 @@ function startGame(){
   showGameScreen();
 }
 
-function showGameScreen(){
+// แสดงหน้าเกม
+function showGameScreen(fromStorage=false){
   document.getElementById('setupScreen').style.display='none';
   document.getElementById('summaryScreen').style.display='none';
   document.getElementById('gameScreen').style.display='block';
   document.getElementById('currentHole').textContent = currentHole+1;
-  renderScoreInputs();
+
+  if(!fromStorage){
+    renderScoreInputs();
+  } else {
+    let html = '';
+    players.forEach((p,i)=>{
+      let runningTotal = scores[i].slice(0,currentHole).reduce((a,b)=>a+b,0);
+      let currentScore = scores[i][currentHole]||0;
+      let totalWithCurrent = runningTotal + currentScore;
+      html+=`<div><label id="label${i}" class="label-player">${p} (รวม: ${totalWithCurrent})</label><input type="number" id="score${i}" value="${scores[i][currentHole]||''}"></div>`;
+    });
+    document.getElementById('scoreInputs').innerHTML = html;
+
+    players.forEach((p,i)=>{
+      document.getElementById('score'+i).addEventListener('input', ()=>{
+        let val = parseFloat(document.getElementById('score'+i).value);
+        scores[i][currentHole]=isNaN(val)?0:val;
+        localStorage.setItem('scores', JSON.stringify(scores));
+        updateRankHighlight();
+      });
+    });
+    updateRankHighlight();
+  }
 }
 
+// render score input
 function renderScoreInputs(){
   let html='';
   let totals = players.map((p,i)=>scores[i].reduce((a,b)=>a+b,0));
@@ -143,6 +168,7 @@ function renderScoreInputs(){
   updateRankHighlight();
 }
 
+// update rank highlight
 function updateRankHighlight(){
   let totals = players.map((p,i)=>scores[i].slice(0,currentHole+1).reduce((a,b)=>a+b,0));
   let sorted = [...totals].map((v,i)=>({i,v})).sort((a,b)=>b.v-a.v);
@@ -155,9 +181,11 @@ function updateRankHighlight(){
   if(sorted[2]) document.getElementById('label'+sorted[2].i).style.color='#cd7f32';
 }
 
+// next/prev hole
 function nextHole(){players.forEach((p,i)=>{scores[i][currentHole]=parseFloat(document.getElementById('score'+i).value)||0; localStorage.setItem('scores', JSON.stringify(scores));}); currentHole++; if(currentHole>=numHoles) showSummary(); else showGameScreen();}
 function prevHole(){players.forEach((p,i)=>{scores[i][currentHole]=parseFloat(document.getElementById('score'+i).value)||0; localStorage.setItem('scores', JSON.stringify(scores));}); if(currentHole>0){currentHole--; showGameScreen();}}
 
+// summary
 function showSummary(){
   document.getElementById('gameScreen').style.display='none';
   document.getElementById('summaryScreen').style.display='block';
@@ -170,6 +198,7 @@ function showSummary(){
   document.getElementById('summaryTable').innerHTML=html;
 }
 
+// share
 function shareResults(){
   let totals = players.map((p,i)=>scores[i].reduce((a,b)=>a+b,0));
   let money = Array(players.length).fill(0);
@@ -180,6 +209,7 @@ function shareResults(){
   document.body.removeChild(textarea);
 }
 
+// hole scores
 function showHoleScores(){
   let html='<tr><th>หลุม</th>'; players.forEach(p=>html+=`<th>${p}</th>`); html+='<th>คะแนนรวมสะสม</th></tr>';
   let runningTotals=Array(players.length).fill(0);
@@ -188,16 +218,18 @@ function showHoleScores(){
   document.getElementById('modalHoleScores').style.display='flex';
 }
 
-// ปิด modal กดปุ่มหรือกดรอบๆ modal
+// modal
 function closeHoleModal(){document.getElementById('modalHoleScores').style.display='none';}
 document.getElementById('modalHoleScores').addEventListener('click', function(e){if(e.target===this){this.style.display='none';}});
 
+// reset
 function resetAll(){document.getElementById('modalReset').style.display='flex'; document.getElementById('modalReset').querySelector('p').textContent="ข้อมูลทั้งหมดจะถูก Reset";}
 function confirmReset(){localStorage.removeItem('players'); localStorage.removeItem('scores'); location.reload();}
 function closeModal(){document.getElementById('modalReset').style.display='none';}
 function goToSetup(){resetAll();}
 function goToHole(h){currentHole=h; showGameScreen();}
-
+  
+// player input generate
 document.getElementById('numPlayers').addEventListener('input', function(){
   let n=parseInt(this.value); let html='';
   for(let i=0;i<n;i++){
@@ -207,29 +239,25 @@ document.getElementById('numPlayers').addEventListener('input', function(){
   document.getElementById('playerNamesInputs').innerHTML=html;
 });
 
-window.onload=function(){
-  let savedPlayers = JSON.parse(localStorage.getItem('players')||'[]');
-  let savedScores = JSON.parse(localStorage.getItem('scores')||'[]');
-  if(savedPlayers.length>0){
-    document.getElementById('numPlayers').value = savedPlayers.length;
-    document.getElementById('numPlayers').dispatchEvent(new Event('input'));
-    savedPlayers.forEach((name,i)=>{
-      let input = document.getElementById('playerName'+i);
-      if(input) input.value = name;
-    });
-    if(savedScores.length>0) scores = savedScores;
+// โหลดจาก storage
+window.onload = function(){
+  let savedPlayers = JSON.parse(localStorage.getItem('players') || '[]');
+  let savedScores = JSON.parse(localStorage.getItem('scores') || '[]');
+
+  if(savedPlayers.length > 0){
+    players = savedPlayers;
+    scores = savedScores.length ? savedScores : Array(players.length).fill(0).map(()=>Array(numHoles).fill(0));
+    currentHole = 0; // สามารถปรับให้โหลดหลุมล่าสุด
+    showGameScreen(true); // true = โหลดจาก storage ไม่สร้าง input ซ้ำ
   }
 };
 
-// ลงทะเบียน service worker
+// service worker
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", function() {
     navigator.serviceWorker.register("service-worker.js")
-    .then(function(registration) {
-      console.log("Service Worker registered with scope:", registration.scope);
-    }, function(err) {
-      console.log("Service Worker registration failed:", err);
-    });
+    .then(function(registration) {console.log("Service Worker registered:", registration.scope);}, 
+          function(err){console.log("Service Worker registration failed:", err);});
   });
 }
 </script>
