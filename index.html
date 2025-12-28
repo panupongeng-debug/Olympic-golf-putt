@@ -137,8 +137,17 @@ button:hover { opacity:0.9; }
 let players=[], scores=[], currentHole=0, numHoles=18, pricePerPoint=10;
 
 // โหลด/บันทึก
-function loadData(){ players=JSON.parse(localStorage.getItem('players')||'[]'); scores=JSON.parse(localStorage.getItem('scores')||'[]'); }
-function saveData(){ localStorage.setItem('players',JSON.stringify(players)); localStorage.setItem('scores',JSON.stringify(scores)); }
+function loadData(){
+  players=JSON.parse(localStorage.getItem('players')||'[]');
+  scores=JSON.parse(localStorage.getItem('scores')||'[]');
+  let savedPrice=parseFloat(localStorage.getItem('pricePerPoint'));
+  if(!isNaN(savedPrice)) pricePerPoint=savedPrice;
+}
+function saveData(){
+  localStorage.setItem('players',JSON.stringify(players));
+  localStorage.setItem('scores',JSON.stringify(scores));
+  localStorage.setItem('pricePerPoint',pricePerPoint);
+}
 
 function startGame(){
   let num=parseInt(document.getElementById('numPlayers').value);
@@ -146,6 +155,7 @@ function startGame(){
   let priceInput=parseFloat(document.getElementById('pricePerPoint').value);
   if(isNaN(priceInput)||priceInput<=0){alert("กรุณากรอกราคาต่อคะแนน"); return;}
   pricePerPoint=priceInput;
+  localStorage.setItem('pricePerPoint', pricePerPoint);
 
   let savedScores=JSON.parse(localStorage.getItem('scores')||'[]');
 
@@ -248,7 +258,7 @@ function openRules(){document.getElementById('modalRules').style.display='flex';
 function closeRules(){document.getElementById('modalRules').style.display='none';}
 
 function resetAll(){document.getElementById('modalReset').style.display='flex';}
-function confirmReset(){localStorage.removeItem('players'); localStorage.removeItem('scores'); location.reload();}
+function confirmReset(){localStorage.removeItem('players'); localStorage.removeItem('scores'); localStorage.removeItem('pricePerPoint'); location.reload();}
 function closeModal(){document.getElementById('modalReset').style.display='none';}
 function goToSetup(){showScreen('setupScreen');}
 
@@ -270,7 +280,11 @@ document.getElementById('numPlayers').addEventListener('input', function(){
 });
 
 // โหลดข้อมูลเมื่อเปิดหน้า
-window.onload=function(){ loadData(); if(players.length>0){document.getElementById('numPlayers').value=players.length; document.getElementById('numPlayers').dispatchEvent(new Event('input')); } }
+window.onload=function(){ loadData(); 
+  if(players.length>0){document.getElementById('numPlayers').value=players.length; document.getElementById('numPlayers').dispatchEvent(new Event('input')); }
+  let savedPrice = parseFloat(localStorage.getItem('pricePerPoint'));
+  if(!isNaN(savedPrice)){ document.getElementById('pricePerPoint').value=savedPrice; pricePerPoint=savedPrice; }
+}
 </script>
 
 </body>
